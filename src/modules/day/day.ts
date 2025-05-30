@@ -215,11 +215,13 @@ export function renderDays() {
 
   // Create object of all days that have events - for creating event bullets
   this.eventDayMap = {};
+  this.availabilityMap = {};
   this.filteredEventsThisMonth.forEach((event: EventData) => {
     const start = new Date(event.start).getDate();
     const end = new Date(event.end).getDate();
     for (let i = start; i <= end; i++) {
       this.eventDayMap[i] = true;
+      this.availabilityMap[i] = (event.availability / event.capacity) * 100 >= 60;
     }
   });
 
@@ -253,7 +255,11 @@ export function renderDays() {
         : ' calendar__day-no-event'
       }${day.selected ? ' calendar__day-selected' : ''}">
         <span class="calendar__day-text">${day.day}</span>
-        <div class="calendar__day-bullet"></div>
+        <div class="calendar__day-bullet${
+          this.availabilityMap[day.day]
+            ? " calendar__day-availability-regular"
+            : " calendar__day-availability-low"
+        }"></div>
         <div class="calendar__day-box"></div>
       </div>
     `;
@@ -294,7 +300,11 @@ export function rerenderSelectedDay(element: HTMLElement, dayNum: number, storeO
     }`;
   div.innerHTML = `
     <span class="calendar__day-text">${dayNum}</span>
-    <div class="calendar__day-bullet"></div>
+    <div class="calendar__day-bullet${
+          this.availabilityMap[dayNum]
+            ? " calendar__day-availability-regular"
+            : " calendar__day-availability-low"
+        }"></div>
     <div class="calendar__day-box"></div>
   `;
 
